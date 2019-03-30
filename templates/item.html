@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <h1>Item:{{item.name}}</h1>
+  <div>
+    <p>Category:<a href = '{{url_for('categoryItem', category_name=category_name)}}'> {{category_name}} </a></p>
+    <p>Description:{{item.description}}</p>
+    <a href = '{{url_for('itemEdit', item_name=item.name)}}'> Edit </a> | <a href = '{{url_for('itemDelete', item_name=item.name)}}'> Delete </a>
+	</div>
+</html>

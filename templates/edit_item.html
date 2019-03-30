@@ -1,0 +1,24 @@
+<html>
+	<head>
+	    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+	</head>
+	<h1>Edit Item: {{item.name}}</h1>
+	<form action='{{url_for('itemEdit', item_name=item.name)}}' method = 'post'>
+		<dt>Category:
+			<select name="category">
+			  {% for category in categories %}
+			    {% if category.name == current_cat%}
+			      <option selected="true" value={{category.id}}>{{category.name}}</option>
+			    {% else %}
+			      <option value={{category.id}}>{{category.name}}</option>
+			    {% endif %}
+			  {% endfor %}
+			</select>
+		</dt>
+		<dt>
+			Description:  <input type ='text' size='350' name='desc' placeholder = {{item.description}}>
+		</dt>
+	  <input type='submit' value='submit'>
+	</form>
+	<a href = '{{url_for('itemDesc', category_name=current_cat, item_name=item.name)}}'> Cancel </a>
+</html>

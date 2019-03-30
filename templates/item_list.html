@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <h1>Category:{{category.name}}</h1>
+	{% for item in items %}
+	  <div>
+		<a href = '{{url_for('itemDesc', category_name=category.name, item_name = item.name)}}'> <strong>{{item.name}}</strong> </a>
+	  </div>
+	{% endfor %}
+	<a href = '{{url_for('catelog')}}'> Back to Menu </a>
+</html>
