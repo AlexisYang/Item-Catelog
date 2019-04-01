@@ -22,7 +22,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-CLIENT_ID = 'Enter google oauth client id here'
+CLIENT_ID = '434746371095-7p0d4eug13jate7tc7t6dm6vembgugja.apps.googleusercontent.com'
 
 
 @app.route('/login')
