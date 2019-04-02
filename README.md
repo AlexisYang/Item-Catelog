@@ -56,6 +56,7 @@ This repository contains following files
 ![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%207.35.19%20PM.png)
 
 * The JSON page shows all the data in the database
+
 ![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%207.30.28%20PM.png)
 
 ## Licience
