@@ -13,13 +13,47 @@ This project is a web application that enable users to create/update/delete item
 * Google OAuth 2.0 [(Reference)](https://developers.google.com/identity/protocols/OAuth2)
 
 ## About this repository
+This repository contains following files
+* database_regen.sh: a script to delete current database and regenerate a new one
+* database_setup.py: a script that define the item catelog database
+* itemCatelog.py: the file to run the web application
+* itemcatelog.db: item catelog database
+* lotsofcategories.py: a script to generate an example item catelog database
+* /template: a directory that stores all the html templates
+* /static: a directory that stores all the webpage styles
 
 ## Quick Start
-* ```python itemCatelog.py```
-* Access the url localhost:5000/
+1. Build the item catelog database: ```python database_setup.py```
+2. Build default categories data: ```python lotsofcategories.py```
+3. Run the webpage: ```python itemCatelog.py```
+4. Access the url localhost:5000/
 
 ## What's' inside
-* The main page contains a column of listed categories, and a column of newly added items. There is a link for google sign in, which enables the access to create/update/delete items.
+* The main page contains a column of listed categories, and a column of newly added items. There is a link for google sign in, which enables the access to create/update/delete items. There is also a link to add new items.
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.14.50%20AM.png)
+* The google login page
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.16.02%20AM.png)
+
+* The new item page to add a item with specified category and description. The newly added item would be immediately shown on the main page
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.17.13%20AM.png)
+* The category page would shown after the user click on random category on the main page
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.19.10%20AM.png)
+* The item page would shown after the user click on random item on the category page. It is allowed to edit or delete item on the item page, only if the user is logged in.
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.19.30%20AM.png)
+* The item edit page
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.19.49%20AM.png)
+* The item delete page
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.20.06%20AM.png)
+* The user can logout by accessing the page ```localhost:5000/gdisconnect```
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%208.20.39%20AM.png)
 
 ## Licience
 The content of this repository is licensed under [GPLv3](https://choosealicense.com/licenses/gpl-3.0/) licience.
