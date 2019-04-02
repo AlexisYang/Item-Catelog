@@ -19,7 +19,7 @@ This project is a web application that enable users to create/update/delete item
 * Access the url localhost:5000/
 
 ## What's' inside
-
+* The main page contains a column of listed categories, and a column of newly added items. There is a link for google sign in, which enables the access to create/update/delete items.
 
 ## Licience
 The content of this repository is licensed under [GPLv3](https://choosealicense.com/licenses/gpl-3.0/) licience.
