@@ -4,7 +4,7 @@
     </head>
 	<h1>Add New Item</h1>
 	<form action={{url_for('itemAdd')}} method='post'>
-		<dt>Name:  <input type ='text' size='30' name='name' placeholder = 'item_name'></dt>
+		<dt>Name:  <input type ='text' size='30' name='name' placeholder = 'item_name' required></dt>
 		<dt>Category:
 			<select name="category">
 			  {% for category in categories %}

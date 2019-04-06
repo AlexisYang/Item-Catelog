@@ -2,7 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for,\
      jsonify, flash
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Item
+from sqlalchemy.orm.exc import NoResultFound
+from database_setup import Base, Category, Item, User
 from datetime import datetime
 from flask import session as login_session
 from oauth2client.client import flow_from_clientsecrets
@@ -22,7 +23,8 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-CLIENT_ID = '434746371095-7p0d4eug13jate7tc7t6dm6vembgugja.apps.googleusercontent.com'
+CLIENT_ID = '434746371095-7p0d4eug13jate7tc7t6dm6vembgugja.apps.'\
+            + 'googleusercontent.com'
 
 
 @app.route('/login')
@@ -30,14 +32,12 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    print 'state: ', state
     return render_template('login.html', STATE=state)
 
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    print 'reqest_state: ', request.args.get('state')
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -106,6 +106,9 @@ def gconnect():
     login_session['email'] = data['email']
     login_session['logged_in'] = True
 
+    if not getUserID(data['email']):
+        createUser(login_session)
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -163,6 +166,12 @@ def catelogJSON():
     return jsonify(Category=json_list)
 
 
+@app.route('/catelog/JSON/<int:category_id>/<int:item_id>/')
+def itemJSON(category_id, item_id):
+    item = session.query(Item).filter_by(id=item_id).first()
+    return jsonify(Item=item.serialize)
+
+
 @app.route('/')
 @app.route('/catelog/')
 def catelog():
@@ -191,13 +200,16 @@ def itemDesc(category_name, item_name):
     category = session.query(Category).filter_by(name=category_name).one()
     item = session.query(Item).filter_by(category_id=category.id,
                                          name=item_name).one()
-    return render_template('item.html', category_name=category_name, item=item)
+    user_name = getUserName(item.user_id)
+    return render_template('item.html', category_name=category_name, item=item,
+                           user_name=user_name)
 
 
 @app.route('/catelog/new/', methods=['GET', 'POST'])
 def itemAdd():
     if 'username' not in login_session:
         return redirect('/login')
+    userId = getUserID(login_session['email'])
     if request.method == 'POST':
         newName = request.form['name']
         categoryId = request.form['category']
@@ -205,7 +217,8 @@ def itemAdd():
         itemNames = [i.name for i in session.query(Item).all()]
         if newName not in itemNames:
             newItem = Item(name=newName, description=desc,
-                           category_id=categoryId, time=datetime.now())
+                           category_id=categoryId, time=datetime.now(),
+                           user_id=userId)
             session.add(newItem)
             session.commit()
         category_all = session.query(Category).all()
@@ -224,6 +237,11 @@ def itemEdit(item_name):
     if 'username' not in login_session:
         return redirect('/login')
     item = session.query(Item).filter_by(name=item_name).one()
+    category = session.query(Category).filter_by(id=item.category_id).one()
+    username = getUserName(item.user_id)
+    if not login_session['username'] == username:
+        flash('You don\'t have permission to modify this item')
+        return itemDesc(category.name, item.name)
     categories = session.query(Category).all()
     if request.method == 'POST':
         item.category_id = request.form['category']
@@ -235,12 +253,10 @@ def itemEdit(item_name):
                                categories=categories,
                                latest_items=latest_items)
     else:
-        current_cat = session.query(Category).filter_by(id=item.category_id)\
-                             .one().name
         return render_template('edit_item.html',
                                item=item,
                                categories=categories,
-                               current_cat=current_cat)
+                               current_cat=category.name)
 
 
 @app.route('/catelog/<string:item_name>/delete/', methods=['GET', 'POST'])
@@ -248,6 +264,11 @@ def itemDelete(item_name):
     if 'username' not in login_session:
         return redirect('/login')
     item = session.query(Item).filter_by(name=item_name).one()
+    category = session.query(Category).filter_by(id=item.category_id).one()
+    username = getUserName(item.user_id)
+    if not login_session['username'] == username:
+        flash('You don\'t have permission to modify this item')
+        return itemDesc(category.name, item.name)
     if request.method == 'POST':
         session.delete(item)
         session.commit()
@@ -258,11 +279,34 @@ def itemDelete(item_name):
                                categories=categories,
                                latest_items=latest_items)
     else:
-        current_cat = session.query(Category).filter_by(id=item.category_id)\
-                             .one().name
         return render_template('delete_item.html',
                                item=item,
-                               category_name=current_cat)
+                               category_name=category.name)
+
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except NoResultFound:
+        return None
+
+
+def getUserName(user_id):
+    try:
+        user = session.query(User).filter_by(id=user_id).one()
+        return user.name
+    except NoResultFound:
+        return None
 
 
 if __name__ == '__main__':
