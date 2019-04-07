@@ -29,9 +29,12 @@ This repository contains following files
 4. Access the url localhost:5000/
 
 ## What's' inside
-* The main page contains a column of listed categories, and a column of newly added items. There is a link for google sign in, which enables the access to create/update/delete items. There is also a link to add new items.
+* The main page contains a column of listed categories, and a column of newly added items. It contains following links:
+    * login link enable user to login via google oauth2. The logged in user is available to add new items, and edit/delete his own items.
+    * logout link
+    * add new item link
 
-![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%207.35.34%20PM.png)
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-07%20at%209.50.24%20AM.png)
 * The google login page
 
 ![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%207.37.23%20PM.png)
@@ -58,6 +61,11 @@ This repository contains following files
 * The JSON page shows all the data in the database
 
 ![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-02%20at%207.30.28%20PM.png)
+
+* The JSON page of a particular item is available with <cateogory_id>/<item_id> as argument of url
+
+![image](https://github.com/AlexisYang/Item-Catelog/blob/master/images/Screen%20Shot%202019-04-07%20at%209.02.54%20AM.png)
+
 
 ## Licience
 The content of this repository is licensed under [GPLv3](https://choosealicense.com/licenses/gpl-3.0/) licience.
