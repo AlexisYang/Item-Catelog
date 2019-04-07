@@ -29,6 +29,10 @@ CLIENT_ID = '434746371095-7p0d4eug13jate7tc7t6dm6vembgugja.apps.'\
 
 @app.route('/login')
 def showLogin():
+    """
+    Returns:
+        string: login page
+    """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -37,6 +41,17 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
+    """
+    Returns:
+        flask.wrappers.Response: include following cases
+            1. Invalid state parameter
+            2. Failed to upgrade the authorization code
+            3. There is an error in the access token info
+            4. Token's user ID doesn't match given user ID
+            5. Token's client ID does not match app's
+            6. Current user is already connected
+        String: when user is successfully logged in
+    """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -127,13 +142,18 @@ def gconnect():
 
 @app.route('/gdisconnect')
 def gdisconnect():
+    """
+    Returns:
+        String: main page
+    """
     access_token = login_session.get('access_token')
     if access_token is None:
-        print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'),
-                                 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        # response = make_response(json.dumps('Current user not connected.'),
+        #                          401)
+        # response.headers['Content-Type'] = 'application/json'
+        # return response
+        flash('Current user not connected.')
+        return redirect('/catelog/')
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
           % login_session['access_token']
     h = httplib2.Http()
@@ -145,18 +165,28 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
         del login_session['logged_in']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        # response = make_response(json.dumps('Successfully disconnected.'),
+        #                          200)
+        # response.headers['Content-Type'] = 'application/json'
+        # return response
+        flash('Successfully disconnected.')
+        return redirect('/catelog/')
     else:
-        response = make_response(json.dumps('Failed to revoke token for given\
-                                             user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        # response = make_response(json.dumps('Failed to revoke token for\
+        #                                      given user.', 400))
+        # response.headers['Content-Type'] = 'application/json'
+        # return response
+        flash('Failed to revoke token for given user.')
+        return redirect('/catelog/')
 
 
 @app.route('/catelog/JSON')
 def catelogJSON():
+    """
+    Returns:
+        flask.wrappers.Response: json field of all categories 
+                                 with relative items
+    """
     categories = session.query(Category).all()
     items_all = session.query(Item)
     json_list = []
@@ -168,6 +198,13 @@ def catelogJSON():
 
 @app.route('/catelog/JSON/<int:category_id>/<int:item_id>/')
 def itemJSON(category_id, item_id):
+    """
+    Args:
+        category_id: (Integer) category id
+        item_id: (Integer) item id
+    Returns:
+        flask.wrappers.Response: json field of specific item
+    """
     item = session.query(Item).filter_by(id=item_id).first()
     return jsonify(Item=item.serialize)
 
@@ -175,21 +212,30 @@ def itemJSON(category_id, item_id):
 @app.route('/')
 @app.route('/catelog/')
 def catelog():
-    # print login_session['state']
+    """
+    Returns:
+        flask.wrappers.Response: catelog page
+    """
+    user_name = ''
     category_all = session.query(Category).all()
     latest_items = session.query(Item).order_by(desc(Item.time))\
                           .limit(10).all()
-    # login = 'Logout' if IS_LOGIN else 'Login'
-    print login_session.__dict__
-    login = 'Logout' if 'logged_in' in login_session else 'Login'
+    if 'logged_in' in login_session:
+        user_name = login_session['username']
     return render_template('catelog.html',
                            categories=category_all,
                            latest_items=latest_items,
-                           login_stats=login)
+                           user_name=user_name)
 
 
 @app.route('/catelog/<string:category_name>/items/')
 def categoryItem(category_name):
+    """
+    Args:
+        category_name: (String) category name
+    Returns:
+        flask.wrappers.Response: category page
+    """
     category = session.query(Category).filter_by(name=category_name).one()
     item_all = session.query(Item).filter_by(category_id=category.id).all()
     return render_template('item_list.html', category=category, items=item_all)
@@ -197,6 +243,13 @@ def categoryItem(category_name):
 
 @app.route('/catelog/<string:category_name>/<string:item_name>/')
 def itemDesc(category_name, item_name):
+    """
+    Args:
+        category_name: (String) category name
+        item_name: (String) item name
+    Returns:
+        flask.wrappers.Response: item page
+    """
     category = session.query(Category).filter_by(name=category_name).one()
     item = session.query(Item).filter_by(category_id=category.id,
                                          name=item_name).one()
@@ -207,6 +260,11 @@ def itemDesc(category_name, item_name):
 
 @app.route('/catelog/new/', methods=['GET', 'POST'])
 def itemAdd():
+    """
+    Returns:
+        flask.wrappers.Response: login page if user is not logged in,
+                                 else return new item page
+    """
     if 'username' not in login_session:
         return redirect('/login')
     userId = getUserID(login_session['email'])
@@ -221,12 +279,7 @@ def itemAdd():
                            user_id=userId)
             session.add(newItem)
             session.commit()
-        category_all = session.query(Category).all()
-        latest_items = session.query(Item).order_by(Item.time.desc())\
-                              .limit(10).all()
-        return render_template('catelog.html',
-                               categories=category_all,
-                               latest_items=latest_items)
+        return redirect('/catelog/')
     else:
         category_all = session.query(Category).all()
         return render_template('new_item.html', categories=category_all)
@@ -234,6 +287,13 @@ def itemAdd():
 
 @app.route('/catelog/<string:item_name>/edit/', methods=['GET', 'POST'])
 def itemEdit(item_name):
+    """
+    Args:
+        item_name: (String) item name
+    Returns:
+        flask.wrappers.Response: item page if user is not permitted to edit,
+                                 else return edit page
+    """
     if 'username' not in login_session:
         return redirect('/login')
     item = session.query(Item).filter_by(name=item_name).one()
@@ -247,11 +307,7 @@ def itemEdit(item_name):
         item.category_id = request.form['category']
         item.description = request.form['desc']
         session.commit()
-        latest_items = session.query(Item).order_by(desc(Item.time)).limit(10)\
-                              .all()
-        return render_template('catelog.html',
-                               categories=categories,
-                               latest_items=latest_items)
+        return redirect('/catelog/')
     else:
         return render_template('edit_item.html',
                                item=item,
@@ -261,6 +317,13 @@ def itemEdit(item_name):
 
 @app.route('/catelog/<string:item_name>/delete/', methods=['GET', 'POST'])
 def itemDelete(item_name):
+    """
+    Args:
+        item_name: (String) item name
+    Returns:
+        flask.wrappers.Response: item page if user is not permitted to delete,
+                                 else return edit page
+    """
     if 'username' not in login_session:
         return redirect('/login')
     item = session.query(Item).filter_by(name=item_name).one()
@@ -273,11 +336,7 @@ def itemDelete(item_name):
         session.delete(item)
         session.commit()
         categories = session.query(Category).all()
-        latest_items = session.query(Item).order_by(desc(Item.time)).limit(10)\
-                              .all()
-        return render_template('catelog.html',
-                               categories=categories,
-                               latest_items=latest_items)
+        return redirect('/catelog')
     else:
         return render_template('delete_item.html',
                                item=item,

@@ -4,13 +4,26 @@
   </head>
   <body>
   <h1>Item Category</h1>
+  <!--MESSAGE FLASHING EXAMPLE -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+      {% for message in messages %}
+        <h3><li><strong>{{message}}</strong></li></h3>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
   <div class="row">
     <div>
-    {% if login_stats == 'Login' %}
-        <a href='{{url_for('showLogin')}}'>Login</a> 
-    {% else %} 
-        <a href='{{url_for('showLogin')}}'>Login(Already Login)</a> 
-    {% endif %}
+      {% if user_name %}
+          <a href='{{url_for('showLogin')}}'>Login({{user_name}})</a> 
+      {% else %} 
+          <a href='{{url_for('showLogin')}}'>Login</a> 
+      {% endif %}
+    </div>
+    <div>
+      <a href='{{url_for('gdisconnect')}}'>Logout</a> 
     </div>
     <!-- <div><a href = '{{url_for('showLogin')}}'>{{login_stats}}</a></div> -->
     <div class="column">
