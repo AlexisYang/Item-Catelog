@@ -184,7 +184,7 @@ def gdisconnect():
 def catelogJSON():
     """
     Returns:
-        flask.wrappers.Response: json field of all categories 
+        flask.wrappers.Response: json field of all categories
                                  with relative items
     """
     categories = session.query(Category).all()
