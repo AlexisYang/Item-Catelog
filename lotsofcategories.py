@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Category, Base, Item
 from datetime import datetime
 
-engine = create_engine('sqlite:///itemcatelog.db')
+engine = create_engine('postgresql://catelog:catelog@localhost/catelog')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
@@ -66,4 +66,4 @@ restaurant1 = Category(name="Hockey")
 session.add(restaurant1)
 session.commit()
 
-print 'category build complete'
+print('category build complete')

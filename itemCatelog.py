@@ -16,7 +16,7 @@ import requests
 app = Flask(__name__)
 
 
-engine = create_engine('sqlite:///itemcatelog.db')
+engine = create_engine('postgresql://catelog:catelog@localhost/catelog')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -30,14 +30,14 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    print 'state: ', state
+    print('state:', state)
     return render_template('login.html', STATE=state)
 
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    print 'reqest_state: ', request.args.get('state')
+    print('reqest_state:', request.args.get('state'))
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -78,7 +78,7 @@ def gconnect():
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
             json.dumps("Token's client ID does not match app's."), 401)
-        print "Token's client ID does not match app's."
+        print('Token\'s client ID does not match app\'s.')
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -118,7 +118,7 @@ def gconnect():
                            -webkit-border-radius: 150px;\
                            -moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
+    print('done!')
     return output
 
 
@@ -126,7 +126,7 @@ def gconnect():
 def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
-        print 'Access Token is None'
+        print('Access Token is None')
         response = make_response(json.dumps('Current user not connected.'),
                                  401)
         response.headers['Content-Type'] = 'application/json'
@@ -171,7 +171,6 @@ def catelog():
     latest_items = session.query(Item).order_by(desc(Item.time))\
                           .limit(10).all()
     # login = 'Logout' if IS_LOGIN else 'Login'
-    print login_session.__dict__
     login = 'Logout' if 'logged_in' in login_session else 'Login'
     return render_template('catelog.html',
                            categories=category_all,
@@ -268,4 +267,4 @@ def itemDelete(item_name):
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
