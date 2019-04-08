@@ -23,10 +23,18 @@ This repository contains following files
 * /static: a directory that stores all the webpage styles
 
 ## Quick Start
+### Create database
+1. Switch to user **postgres** ```sudo su postgres```
+2. Create database **catelog** ```createdb catelog```
+3. Create database user **catelog**  ```createuser catelog --interactive```
+4. Give user a password ```sudo -u postgres psql```, ```alter user catelog with encrypted password 'catelog';```
+5. Switch user back ```ctrl+D```
+### Setup database structure and default columns
 1. Build the item catelog database: ```python database_setup.py```
 2. Build default categories data: ```python lotsofcategories.py```
-3. Run the webpage: ```python itemCatelog.py```
-4. Access the url localhost:5000/
+### Access webpage
+1. Run the webpage: ```python itemCatelog.py```
+2. Access the url localhost:5000/
 
 ## What's' inside
 * The main page contains a column of listed categories, and a column of newly added items. It contains following links:
