@@ -3,6 +3,7 @@ chardet==3.0.4
 Click==7.0
 Flask==1.0.2
 get==2019.3.22
+gunicorn
 httplib2==0.12.1
 idna==2.8
 itsdangerous==1.1.0
