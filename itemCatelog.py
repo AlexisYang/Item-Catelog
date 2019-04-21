@@ -14,8 +14,10 @@ import string
 import httplib2
 import json
 import requests
+import secret_key
 app = Flask(__name__)
-
+app.debug = True
+secret_key.install_secret_key(app)
 
 engine = create_engine('postgresql://catelog:catelog@localhost/catelog')
 Base.metadata.bind = engine
@@ -23,7 +25,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-CLIENT_ID = '434746371095-7p0d4eug13jate7tc7t6dm6vembgugja.apps.'\
+CLIENT_ID = '1050364021346-l1r8r3j7jnis2i8e6oht3drlpk9q4a4t.apps.'\
             + 'googleusercontent.com'
 
 
@@ -34,7 +36,7 @@ def showLogin():
         string: login page
     """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in xrange(32))
+                    for x in range(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
@@ -61,7 +63,7 @@ def gconnect():
     code = request.data
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('/var/www/html/Item-Catelog/client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -74,7 +76,7 @@ def gconnect():
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1])
+    result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -368,7 +370,10 @@ def getUserName(user_id):
         return None
 
 
+# print('apppppppppppppp')
+# app.debug = True
+# app.run()
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host='0.0.0.0', port=80)
+    # app.secret_key = 'super_secret_key'
+    app.run()
+    # app.run(host='0.0.0.0', port=5000)

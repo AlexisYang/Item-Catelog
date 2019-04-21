@@ -35,14 +35,14 @@ restaurant1 = Category(name="Baseball")
 session.add(restaurant1)
 session.commit()
 
-item1 = Item(name="bat", category_id=restaurant1.id,
-             description="A baseball bat is a smooth wooden or metal club " +
-                         "used in the sport of baseball to hit the ball " +
-                         "after it is thrown by the pitcher.",
-             time=datetime.now())
+# item1 = Item(name="bat", category_id=restaurant1.id,
+#              description="A baseball bat is a smooth wooden or metal club " +
+#                          "used in the sport of baseball to hit the ball " +
+#                          "after it is thrown by the pitcher.",
+#              time=datetime.now())
 
-session.add(item1)
-session.commit()
+# session.add(item1)
+# session.commit()
 
 restaurant1 = Category(name="Frisbee")
 
